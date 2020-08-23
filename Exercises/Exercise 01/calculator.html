@@ -1,0 +1,202 @@
+<html>
+    <head>
+        <!-- <title>Magenic Masters: Vue | Batch 2 | Exercise 001: Simple Calculator</title> -->
+        <title>Simple Calculator</title>
+        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    </head>
+    <body>
+        <div id="app">
+            <div class="calculator">
+                <div id="valueDisplay">{{ displayValue }}</div>
+
+                <a id="btn1" @click='appendDigit(1)'>1</a>
+                <a id="btn2" @click='appendDigit(2)'>2</a>
+                <a id="btn3" @click='appendDigit(3)'>3</a>
+                <a id="btnA" @click='operatorClick("+")' class="operator">+</a>
+                
+                <a id="btn4" @click='appendDigit(4)'>4</a>
+                <a id="btn5" @click='appendDigit(5)'>5</a>
+                <a id="btn6" @click='appendDigit(6)'>6</a>
+                <a id="btnS" @click='operatorClick("-")' class="operator">&minus;</a>
+                
+                <a id="btn7" @click='appendDigit(7)'>7</a>
+                <a id="btn8" @click='appendDigit(8)'>8</a>
+                <a id="btn9" @click='appendDigit(9)'>9</a>
+                <a id="btnM" @click='operatorClick("*")' class="operator">&times;</a>
+                
+                <a id="btn0" @click='appendDigit(0)'>0</a>
+                <a id="btnE" @click='operatorClick("=")' class="operator">=</a>
+                <a id="btnD" @click='operatorClick("/")' class="operator">&divide;</a>
+            </div>
+        </div>
+    </body>
+
+    <script>
+        new Vue({
+            el: "#app", 
+            data: {
+                displayValue: '',
+                operand1: 0,
+                operator: '=', 
+                computeDone: false
+            },
+            methods: {
+                appendDigit: function(value) {
+                    // reset display if displaying calculation result
+                    if (this.computeDone) {
+                        this.displayValue = '';
+                        this.computeDone = false;
+                    }
+
+                    this.displayValue += value !== 0 ? value    // non-zero digit
+                        : this.displayValue === '' ? ''         // leading zero, do not display
+                        : '0';                                  // zero digit
+                },
+
+                operatorClick: function(value) {
+                    // disable chained operation 
+                    if (this.computeDone) {
+                        this.displayValue = '';
+                        this.computeDone = false;
+                    }
+
+                    if (this.displayValue === '') return;
+                    
+                    switch(value) {
+                        case '=':
+                            //calculate
+                            this.displayValue = this.operator === '+' ? this.operand1 += +this.displayValue
+                                : this.operator === '-' ? this.operand1 -= +this.displayValue
+                                : this.operator === '*' ? this.operand1 *= +this.displayValue
+                                : this.operator === '/' ? this.operand1 /= +this.displayValue
+                                : this.displayValue;
+                                
+                            this.operand1 = value === '=' && value !== this.operator ? 0 : this.operand1;
+                            this.computeDone = value === '=' && value !== this.operator;
+                            this.operator = value;
+
+                            break;
+
+                        default:
+                            this.operand1 = +this.displayValue;
+                            this.operator = value;
+                            this.displayValue = '';
+                    }
+                }
+                
+            }
+        })
+    </script>
+
+    <style>
+        #app {
+            display: flex;
+            justify-content: center;
+        }
+
+        .calculator {
+            background-color: #effcec;
+            border: 0.5px solid #768d87;
+            border-radius: 5px;
+            max-width: 25%;
+            min-width: 242px;
+            display: grid;
+            padding: 10px;
+            gap: 5px;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(5, 1fr);
+            grid-template-areas: "valueDisplay valueDisplay valueDisplay valueDisplay"
+                "btn1 btn2 btn3 btnA"
+                "btn4 btn5 btn6 btnS"
+                "btn7 btn8 btn9 btnM"
+                "btn0 btnE btnE btnD";
+            box-shadow: 0.5px 0.5px #2b665e;
+        }
+
+        .calculator a {
+            box-shadow: inset 0px 1px 3px 0px #91b8b3;
+            background: linear-gradient(to bottom, #768d87 5%, #6c7c7c 100%);
+            background-color: #768d87;
+            border-radius: 5px;
+            border: 1px solid #566963;
+            display:inline-block;
+            cursor:pointer;
+            color:#ffffff;
+            font-family:Arial;
+            font-size:15px;
+            font-weight: bold;
+            padding: 11px 23px;
+            text-decoration: none;
+            text-shadow: 0px -1px 0px #2b665e;
+            line-height: 1.75em;
+            text-align: center;
+        }
+
+        .calculator a:hover {
+            background: linear-gradient(to bottom, #6c7c7c 5%, #768d87 100%);
+            background-color: #6c7c7c;
+        }
+
+        .calculator a:active {
+            position: relative;
+            top: 1px;
+        }
+
+        .calculator a.operator {
+            box-shadow:inset 0px 1px 3px 0px #7a8eb9;
+            background:linear-gradient(to bottom, #637aad 5%, #5972a7 100%);
+            background-color:#637aad;
+            border-radius:5px;
+            border:1px solid #314179;
+            display:inline-block;
+            cursor:pointer;
+            color:#ffffff;
+            font-family:Arial;
+            font-size:15px;
+            font-weight:bold;
+            padding:11px 23px;
+            text-decoration:none;
+            text-shadow:0px -1px 0px #7a8eb9;
+        }
+
+        .calculator a.operator:hover {
+            background:linear-gradient(to bottom, #5972a7 5%, #637aad 100%);
+            background-color:#5972a7;
+        }
+
+        .calculator a.operator:active {
+            position:relative;
+            top:1px;
+        }
+
+        #valueDisplay { 
+            background-color: #ffffff;
+            grid-area: valueDisplay; 
+            border: 0.5px solid #768d87;
+            text-align: right;
+            line-height: 2em;
+            padding: 0 8px;
+            font-size: 24px;
+            border-radius: 5px;
+            box-shadow: inset 0.5px 0.5px dimgrey;
+        }
+
+        #btn1 { grid-area: btn1; }
+        #btn2 { grid-area: btn2; }
+        #btn3 { grid-area: btn3; }
+        #btn4 { grid-area: btn4; }
+        #btn5 { grid-area: btn5; }
+        #btn6 { grid-area: btn6; }
+        #btn7 { grid-area: btn7; }
+        #btn8 { grid-area: btn8; }
+        #btn9 { grid-area: btn9; }
+        #btn0 { grid-area: btn0; }
+        
+        #btnM { grid-area: btnM; }
+        #btnD { grid-area: btnD; }
+        #btnA { grid-area: btnA; }
+        #btnS { grid-area: btnS; }
+        #btnE { grid-area: btnE; }
+
+    </style>
+</html>

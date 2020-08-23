@@ -1,0 +1,33 @@
+<html>
+    <head>
+        <title>Hello World</title>
+        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    </head>
+
+    <body>
+        <div id="app">
+            <input type="text" 
+                @input="counter++"
+                @keyup.enter='input=$event.target.value' />
+            <p>{{ output }}</p>
+            <p>{{ counter }}</p>
+        </div>
+    </body>
+
+    <script>
+        new Vue({
+            el: '#app', 
+            data: {
+                input: '', 
+                counter: 0
+            },
+            computed: {
+                output: function() {
+                    return this.input.trim() !== '' 
+                        ? `The user entered ${this.input}`
+                        : this.input.trim();
+                }
+            }
+        })
+    </script>
+</html>

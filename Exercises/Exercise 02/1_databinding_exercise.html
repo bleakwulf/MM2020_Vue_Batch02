@@ -1,0 +1,64 @@
+<html>
+    <head>
+        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+        <style>
+            input, select {
+                width: 200px;
+                height: 30px;
+            }
+        </style>
+    </head>
+
+    <div id="app">
+        <form @submit.prevent="submit">
+            <div>First Name</div>
+            <div><input type="text" v-model="person.firstName"/></div>
+
+            <div>Last Name</div>
+            <div><input type="text" v-model="person.lastName"/></div>
+
+            <div>Gender</div>
+            <div>
+                <select v-model="person.gender">
+                    <option>Male</option>
+                    <option>Female</option>
+                </select>
+            </div>
+
+            <br />
+            <button type="submit">Submit</button>
+        </form>
+
+        <div id="output" v-html="display.toHTMLString()">
+        </div>
+    </div>
+
+    <script>
+        class Person {
+            constructor(firstName, lastName, gender) {
+                this.firstName = firstName;
+                this.lastName = lastName;
+                this.gender = gender;
+            }
+
+            toHTMLString = function () {
+                return `<p>First Name: ${this.firstName} </p>
+                        <p>Last Name: ${this.lastName} </p>
+                        <p>Gender: ${this.gender} </p>`
+            }
+        }
+
+        new Vue({
+            el: '#app',
+            data: {
+                person: new Person(), 
+                display: new Person()
+            }, 
+            methods: {
+                submit: function() {
+                    Object.assign(this.display, { ...this.person });
+                }
+            }
+        })
+    </script>
+</html>
