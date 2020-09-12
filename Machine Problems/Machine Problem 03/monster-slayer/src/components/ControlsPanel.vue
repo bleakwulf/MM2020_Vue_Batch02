@@ -7,7 +7,7 @@
                     @mouseenter="showSkillDesription(skill, 'OVER')"
                     @mouseleave="showSkillDesription(skill, 'OUT')">
                     <button  
-                        :disabled="!enableSkill(skill)"
+                        :disabled="skillInEffect || !enableSkill(skill)"
                         @click="executeSkill(skill)">
                         {{ skill.name }}
                     </button>
@@ -19,7 +19,7 @@
                     @mouseenter="showSkillDesription(skill, 'OVER')" 
                     @mouseleave="showSkillDesription(skill, 'OUT')">
                     <button 
-                        :disabled="!enableSkill(skill)" 
+                        :disabled="skillInEffect || !enableSkill(skill)" 
                         @click="executeSkill(skill)">
                         {{ skill.name }}
                     </button>
@@ -28,7 +28,7 @@
         </div>
         <div id="skillDescription" v-if="!!this.matchState && this.povTurn === 1">
             <div id="skillWarning" v-if="skillWarning"> 
-                <span class="warning-prefix">&#9888;Warning: </span>
+                <span class="warning-prefix">Warning: </span>
                 {{ skillWarning }}
             </div>
             <div>{{ skillDescription }}</div>
@@ -69,7 +69,8 @@ export default {
             skillWarning: '',
             skillDescription: '',
             matchState: true, 
-            povTurn: 1
+            povTurn: 1,
+            skillInEffect: false
         }
     },
     methods: {
@@ -98,6 +99,7 @@ export default {
             }
         }, 
         executeSkill: function(skill) {
+            this.skillInEffect = true;
             const payLoad = {
                 povSource: 1, 
                 skillWielded: skill
@@ -133,6 +135,7 @@ export default {
             this.povTurn = 0;
         }); 
         eventBus.$on('SWITCH_TURN', payload => {
+            this.skillInEffect = false;
             if ( !!this.matchState ) {
                 ({ povTurn: this.povTurn } = payload);
             }
@@ -145,7 +148,7 @@ export default {
     #gameControlPanel {
         padding: 10px;
         display: grid;
-        grid-template-rows: repeat(2, 50%);
+        grid-template-rows: 75px 80px;
         grid-template-areas: "controls" "description";
         background-color: limegreen;
         border: 0.5px solid lime;
@@ -161,9 +164,51 @@ export default {
         padding-bottom: 10px;
     }
 
+    #player1moves button {
+        font-size: 10px;
+        font-weight: bold;
+        padding: 6px 10px;
+        min-width: 110px;
+        border: none;
+        border-radius: 5px;
+        box-shadow: 0px 10px 14px -7px #f0f7fa;
+        background:linear-gradient(to bottom, #33bdef 5%, #019ad2 100%);
+        background-color:#33bdef;
+        display:inline-block;
+        cursor:pointer;
+        color:#ffffff;
+        text-decoration:none;
+        text-shadow:0px 1px 0px #5b6178;
+    }
+
+    #player1moves button:not(:disabled):hover {
+        background:linear-gradient(to bottom, #019ad2 5%, #33bdef 100%);
+        background-color:#019ad2;
+    }
+
+    #player1moves button:disabled {
+        opacity: 65%;
+    }
+
+    #advanced-skills {
+        margin-top: 10px;
+    }
+
+    #basic-skills div:not(:first-child),
+    #advanced-skills div:not(:first-child) {
+        margin-left: 2px;
+    }
+
     #skillDescription {
         grid-area: description;
-        /* height: 10%; */
+        text-align: left;
+        width: 100%;
+        font-size: 10px;
+        font-family: monospace;
+    }
+
+    #skillDescription  div{
+        max-width: fit-content;
     }
 
     #skillWarning {

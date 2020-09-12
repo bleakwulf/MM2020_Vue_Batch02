@@ -102,7 +102,7 @@ export class Goblin extends PlayableCharacter {
         super(
             'Goblin', 
             null,
-            250, 
+            350, 
             400, 
             [
                 new Skill(

@@ -65,8 +65,8 @@
                             'is-invalid': $v.characterName.$error 
                         }">
                     <div class="error" v-if="$v.characterName.$dirty && !$v.characterName.required">Character Name is required.</div>
-                    <div class="error" v-if="$v.characterName.$dirty && !$v.characterName.minLength">Character Name must be at least {{$v.name.$params.minLength.max}} characters long.</div>
-                    <div class="error" v-if="$v.characterName.$dirty && !$v.characterName.maxLength">Character Name must be no longer than {{$v.name.$params.maxLength.max}} characters long.</div>
+                    <div class="error" v-if="$v.characterName.$dirty && !$v.characterName.minLength">Character Name must be at least {{$v.characterName.$params.minLength.min}} characters long.</div>
+                    <div class="error" v-if="$v.characterName.$dirty && !$v.characterName.maxLength">Character Name must be no longer than {{$v.characterName.$params.maxLength.max}} characters long.</div>
                 </div>
                 <div class="form-group">
                     <select v-model="characterClass" 
@@ -141,7 +141,6 @@ export default {
     computed: {
         characterClasses: function() {
             const characterClasses = Object.keys(CharacterClass);
-            console.log(characterClasses);
             
             return Object.keys(CharacterClass)
                 .filter(x => !(parseInt(x) >= 0))
@@ -155,7 +154,6 @@ export default {
     }, 
     methods: {
         save: function() {
-            debugger
             localStorage.setItem('monster-slayer-app', 
                 JSON.stringify({
                     fullName: this.fullName, 

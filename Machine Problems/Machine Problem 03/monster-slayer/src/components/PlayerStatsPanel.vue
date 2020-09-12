@@ -111,8 +111,8 @@ export default {
 
             } else if(povSource === this.pov)  {
 
-                const canGainHP = this.playerHP >= this.playerMaxHP;
-                const canGainMP = this.playerMP >= this.playerMaxMP;
+                const canGainHP = this.playerHP <= this.playerMaxHP;
+                const canGainMP = this.playerMP <= this.playerMaxMP;
 
                 const playerNewHP = this.playerHP + skillWielded.hpCost || 0;
                 const playerNewMP = this.playerMP + skillWielded.mpCost || 0;
@@ -307,6 +307,9 @@ export default {
         .player-name {
             margin: 5px 10px;
             float: left;
+            font-size: 10px;
+            font-family: monospace;
+            font-weight: bold;
         }
         
         .player-name-p2pov {

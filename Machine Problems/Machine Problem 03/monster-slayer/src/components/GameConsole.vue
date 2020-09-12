@@ -29,7 +29,8 @@ import {
     Lancer, 
     Berserker, 
     Caster, 
-    Goblin 
+    Goblin, 
+    Saber
 } from '../shared/PlayableCharacter.js'
 
 export default {
@@ -51,7 +52,6 @@ export default {
     },
     methods: {
         startGame: function() {
-            debugger
             this.player1 = this.buildPlayerCharacter();
             this.player2 = new Player(2, 'Goblin', new Goblin());
             this.gameState = true;
@@ -60,7 +60,6 @@ export default {
             this.withSavedProfile = !!this.getSavedProfile();
         },
         buildPlayerCharacter: function() {
-            debugger
             let character;
             const characterProfile = JSON.parse(this.getSavedProfile());
 
@@ -69,7 +68,7 @@ export default {
             } else {
                 switch (characterProfile.characterClass) {
                     case CharacterClass.SABER:
-                        character = new SABER(characterProfile.characterName);
+                        character = new Saber(characterProfile.characterName);
                         break;
                     case CharacterClass.ARCHER:
                         character = new Archer(characterProfile.characterName);
@@ -81,7 +80,7 @@ export default {
                         character = new Berserker(characterProfile.characterName);
                         break;
                     case CharacterClass.CASTER:
-                        character = new CASTER(characterProfile.characterName);
+                        character = new Caster(characterProfile.characterName);
                         break;
                 }
             }
