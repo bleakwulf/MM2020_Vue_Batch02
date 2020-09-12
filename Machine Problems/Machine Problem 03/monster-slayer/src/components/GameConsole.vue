@@ -2,9 +2,15 @@
     <div id="game-console">
         <div id="game-display">
             <div id="titleCard">{{ gameTitle }}</div>
-            <app-profile-form v-if="!withSavedProfile"></app-profile-form>
+            <div id="loadingSpinner" v-if="isLoading">
+                <h4> Loading...</h4>
+                <div class="spinner-border text-info" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
+            </div>
+            <app-profile-form v-if="!withSavedProfile && !isLoading"></app-profile-form>
             <!-- <app-splash-screen v-if="!gameState"></app-splash-screen> -->
-            <app-match-display v-if="withSavedProfile"
+            <app-match-display v-if="withSavedProfile && !isLoading"
                 :player1="player1"
                 :player2="player2"
                 :withMPHandicap="true">
@@ -42,7 +48,8 @@ export default {
             player1: this.buildPlayerCharacter(),
             player2: new Player(2, 'Goblin', new Goblin()),
             matchState: true, 
-            povTurn: 1
+            povTurn: 1, 
+            isLoading: false
         }
     }, 
     components: {
@@ -57,6 +64,7 @@ export default {
             this.gameState = true;
             this.matchState = true; 
             this.povTurn = 1;
+            this.isLoading = false;
             this.withSavedProfile = !!this.getSavedProfile();
         },
         buildPlayerCharacter: function() {
@@ -93,7 +101,12 @@ export default {
     },
     created: function() {
         eventBus.$on('START_GAME', (gameState) => {
-            this.startGame();
+            this.isLoading = true;
+            setTimeout( () => { this.startGame() }, 2000 );
+        }),
+        eventBus.$on('NEW_GAME', () => {
+            this.isLoading = true;
+            setTimeout( () => { this.startGame() }, 2000 );
         }),
         eventBus.$on('QUIT_GAME', gameState => {
             this.gameState = false;
@@ -130,6 +143,16 @@ export default {
         box-shadow: 0.5px 0.5px #2b665e;
         border: 0.5px solid #768d87;
         background-color: #effcec;
+    }
+
+    #loadingSpinner {
+        display: flex;
+        flex-flow: column;
+        justify-content: center;
+        align-items: center;
+        color: #17a2b8;
+        font-family: monospace;
+        font-weight: bold;
     }
 
     #game-display {

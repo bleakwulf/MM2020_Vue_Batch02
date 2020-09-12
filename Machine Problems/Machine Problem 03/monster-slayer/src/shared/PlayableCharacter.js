@@ -100,7 +100,7 @@ export class BaseCharacter extends PlayableCharacter {
 export class Goblin extends PlayableCharacter {
     constructor(name) {
         super(
-            'Goblin', 
+            name || 'Goblin', 
             null,
             350, 
             400, 
@@ -143,7 +143,7 @@ export class Goblin extends PlayableCharacter {
 export class Saber extends PlayableCharacter {
     constructor(name) {
         super(
-            name, 
+            name || 'Saber', 
             CharacterClass.SABER, 
             350, 
             450, 
@@ -189,7 +189,7 @@ export class Saber extends PlayableCharacter {
 export class Archer extends PlayableCharacter {
     constructor(name) {
         super(
-            name, 
+            name || 'Archer', 
             CharacterClass.ARCHER, 
             300, 
             350, 
@@ -235,7 +235,7 @@ export class Archer extends PlayableCharacter {
 export class Lancer extends PlayableCharacter {
     constructor(name) {
         super(
-            name, 
+            name || 'Lancer', 
             CharacterClass.LANCER, 
             300, 
             400, 
@@ -281,7 +281,7 @@ export class Lancer extends PlayableCharacter {
 export class Berserker extends PlayableCharacter {
     constructor(name) {
         super(
-            name, 
+            name || 'Berserker', 
             CharacterClass.BERSERKER, 
             450, 
             300, 
@@ -327,7 +327,7 @@ export class Berserker extends PlayableCharacter {
 export class Caster extends PlayableCharacter {
     constructor(name) {
         super(
-            name, 
+            name || 'Caster', 
             CharacterClass.CASTER, 
             400, 
             800, 

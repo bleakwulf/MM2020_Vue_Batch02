@@ -181,7 +181,6 @@ export default {
     .profile-form {
         flex-grow: 1;
         flex-basis: 45%;
-        /* text-align: center; */
     }
 
     .error {    

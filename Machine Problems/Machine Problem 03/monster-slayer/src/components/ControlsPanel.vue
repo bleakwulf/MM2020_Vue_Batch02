@@ -34,8 +34,12 @@
             <div>{{ skillDescription }}</div>
         </div>
         <!-- <div id="endGameOptions" v-if="this.povTurn === 0">
-            <button type="button" @click.prevent="newMatch()">New Game</button>
-            <button type="button" @click.prevent="quit()">Quit</button>
+            <div>
+                <button type="button" @click="newMatch()">New Game</button>
+            </div>
+            <div>
+                <button type="button" @click="quit()">Quit</button>
+            </div>
         </div> -->
     </div>
 </template>
@@ -106,10 +110,12 @@ export default {
             };
             eventBus.$emit('PLAYER_MOVED', payLoad );
         },
-        newMatch() {
+        newMatch: function() {
             eventBus.$emit('NEW_GAME', true);
+            this.matchState = false;
+            this.povTurn = 0;
         },
-        quit() {
+        quit: function() {
             eventBus.$emit('QUIT_GAME', true);
         }
     },
@@ -159,12 +165,26 @@ export default {
         flex-flow: row nowrap;
 
     }
+
+    #endGameOptions {
+        grid-row: 1 / 3;
+        display: flex;
+        text-align: center;
+        justify-content: center;
+        align-items: center
+    }
+
+    #endGameOptions div {
+        display: inline-block;
+    }
+
     #player1moves {
         grid-area: controls;
         padding-bottom: 10px;
     }
 
-    #player1moves button {
+    #player1moves button, 
+    #endGameOptions button {
         font-size: 10px;
         font-weight: bold;
         padding: 6px 10px;
@@ -179,15 +199,20 @@ export default {
         color:#ffffff;
         text-decoration:none;
         text-shadow:0px 1px 0px #5b6178;
+        cursor: default;
     }
 
-    #player1moves button:not(:disabled):hover {
+    #player1moves button:not(:disabled):hover, 
+    #endGameOptions button:not(:disabled):hover {
         background:linear-gradient(to bottom, #019ad2 5%, #33bdef 100%);
         background-color:#019ad2;
+        cursor: default;
     }
 
-    #player1moves button:disabled {
+    #player1moves button:disabled,
+    #endGameOptions button:disabled {
         opacity: 65%;
+        cursor: not-allowed;
     }
 
     #advanced-skills {
@@ -195,7 +220,8 @@ export default {
     }
 
     #basic-skills div:not(:first-child),
-    #advanced-skills div:not(:first-child) {
+    #advanced-skills div:not(:first-child), 
+    #endGameOptions div:not(:first-child) {
         margin-left: 2px;
     }
 
@@ -207,7 +233,7 @@ export default {
         font-family: monospace;
     }
 
-    #skillDescription  div{
+    #skillDescription div {
         max-width: fit-content;
     }
 
@@ -217,10 +243,5 @@ export default {
 
     .warning-prefix {
         font-weight: bold;
-    }
-
-    #endGameOptions {
-        grid-area: controls description;
-        text-align: center;
     }
 </style>

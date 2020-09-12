@@ -57,8 +57,14 @@ import BattleNotification from './BattleNotification.vue'
 
 export default {
     props: {
-        player1: Object,
-        player2: Object, 
+        player1: {
+            type: Object, 
+            required: true
+        },
+        player2:  {
+            type: Object, 
+            required: true
+        },
         withMPHandicap: {
             type: Boolean, 
             default: false
@@ -86,9 +92,9 @@ export default {
             this.matchWinner = 0;
         }
     }, 
-    created() {
+    created: function() {
         eventBus.$on('NEW_GAME', () => {
-            this.resetGame();
+            setTimeout( () => { this.resetGame() }, 1000 );
         }),
         eventBus.$on('END_GAME', payload => {
             const { povLost } = payload;

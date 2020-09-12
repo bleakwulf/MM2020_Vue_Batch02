@@ -82,7 +82,7 @@ export default {
             return Math.round((this.playerHP / this.playerMaxHP) * 100) <= this.criticalHPPercent;
         }
     },
-    created() {
+    created: function() {
         eventBus.$on('PLAYER_MOVED', payload => {
             const { povSource, skillWielded } = payload;
             const eventEmitIntervals = 2000;
