@@ -83,6 +83,7 @@ export default {
                     this.buildPlayerCharacter();
                 }, error => {
                     alert(`Invalid username and/or password.`);
+                    eventBus.$emit('SHOW_LOADING_SPINNER', { showSpinner: false });
                 })
         },
         signup: function() {
