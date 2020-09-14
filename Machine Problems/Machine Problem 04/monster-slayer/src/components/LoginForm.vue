@@ -91,7 +91,6 @@ export default {
         buildPlayerCharacter: function() {
             this.getCharacter(this.accountId)
                 .then(res => {
-                    debugger
                     const { stats, skills, name, classType } = res.body;
                     const advancedSkills = this.mapSkills(skills);
                     const characterProfile = new PlayableCharacter( name, classType, stats.health, stats.mana , advancedSkills );
