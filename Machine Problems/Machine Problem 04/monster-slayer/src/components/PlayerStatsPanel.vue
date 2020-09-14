@@ -37,6 +37,7 @@
 
 <script>
 import { eventBus } from '../main';
+import * as APP_CONSTANTS from '../shared/constants/constants.js';
 import { SkillNatureType } from '../shared/Skill.js'
 
 export default {
@@ -63,10 +64,10 @@ export default {
             playerHPBar: 100,
             playerHPGainBar: 0,
             playerHPDamageBar: 100,
-            playerMP: !!this.withMPHandicap ? this.playerMaxMP * 0.65 : this.playerMaxMP || 100,
-            playerMPBar: !!this.withMPHandicap ? 65 : 100,
-            playerMPDamageBar: !!this.withMPHandicap ? 65 : 100,
-            playerMPGainBar: !!this.withMPHandicap ? 65 : 100,
+            playerMP: !!this.withMPHandicap ? this.playerMaxMP * APP_CONSTANTS.percentMPHandicap : this.playerMaxMP || 100,
+            playerMPBar: !!this.withMPHandicap ? APP_CONSTANTS.percentMPHandicap * 100 : 100,
+            playerMPDamageBar: !!this.withMPHandicap ? APP_CONSTANTS.percentMPHandicap * 100 : 100,
+            playerMPGainBar: !!this.withMPHandicap ? APP_CONSTANTS.percentMPHandicap * 100 : 100,
             isEnemyAttack:  false
         };
     }, 
