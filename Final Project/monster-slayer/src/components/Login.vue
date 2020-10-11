@@ -1,8 +1,7 @@
 <template>
-  <div>
-    <div class="container">
+    <div class="login">
         <div class="h-spacer"></div>
-        <div class="login-form main-form">
+        <div class="login-form">
             <form>
                 <div class="form-group">
                     <input type="text"
@@ -38,12 +37,9 @@
                             @click.prevent="signup()">SIGN UP</button>
                 </div>
             </form>
-            <p>accountId {{ accountId }}</p>
-            <p>userdata {{ userdata }}</p>
         </div>
         <div class="h-spacer"></div>
     </div>
-  </div>
 </template>
 
 <script>
@@ -95,17 +91,17 @@ export default {
 </script>
 
 <style>
-    .container {
-        display: flex;
-        flex-flow: row nowrap;
-    }
-    .h-spacer {
-        flex-grow: 1;
+    .login {
+      display: flex;
+      flex-flow: row nowrap;
     }
 
-    .main-form {
-        flex-grow: 1;
-        flex-basis: 45%;
+    .login-form {
+        flex-basis: 50%;
+        padding: 20px 30px;
+        border-radius: 10px;
+        background: #ffffff;
+        box-shadow:  20px 20px 60px #d9d9d9, 
+                    -20px -20px 60px #ffffff;
     }
-
 </style>

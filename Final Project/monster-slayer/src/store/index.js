@@ -12,13 +12,17 @@ const state = {
     user: null, 
     accountId: null, 
     characterData: null, 
+    computedStats: null,
     inventory: null, 
     dungeons: null, 
 };
 
 const getters = {
     getUser:  state => state.user,
-    getAccountId: state => state.accountId
+    getAccountId: state => state.accountId,
+    getCharacterData: state => state.characterData, 
+    getCharacterStats: state => state.user.stats, 
+    getComputedStats: state => state.computedStats
 };
 
 const actions = {
@@ -45,6 +49,7 @@ const actions = {
         await dispatch('validateCredential', payload );
         return await dispatch('loadUserData')
             .then( res => {
+                dispatch('loadComputedStats');
                 return;
             }).catch( err => {
                 console.log('Error enountered while performing validation of login credentials.', err);
@@ -59,6 +64,10 @@ const actions = {
             });
     }, 
 
+    async logout({ commit }) {
+        await commit( MUTATION_TYPES.LOGOUT_USER );
+    }, 
+
     loadCharacterData({ commit }, payload ) {
         const { characterId } = payload.data;
         axios.get(`${BASE_URL}character/${characterId}`)
@@ -66,6 +75,17 @@ const actions = {
             commit( MUTATION_TYPES.SET_CHARACTER_DATA, res.data );
         });
     }, 
+
+    async loadComputedStats({ commit, state }) {
+        const { stats, equipment: { weapon: { bonus: weaponBonus }, armor: { bonus: armorBonus } } } = state.user;
+
+        const computedStats = Object.assign({}, stats);
+
+        Object.keys(computedStats).forEach( attr => {
+            computedStats[attr] += weaponBonus[attr] + armorBonus[attr];
+        });
+        commit( MUTATION_TYPES.SET_COMPUTED_STATS, computedStats )
+    },
 
     loadInventory({ commit }, payload ) {
         const { characterId } = payload.data;
@@ -100,6 +120,10 @@ const mutations = {
 
     [MUTATION_TYPES.SET_CHARACTER_DATA] (state, payload) {
         state.characterData = payload;
+    },
+
+    [MUTATION_TYPES.SET_COMPUTED_STATS] (state, payload) {
+        state.computedStats = payload;
     },
 
     [MUTATION_TYPES.SET_INVENTORY] (state, payload) {
