@@ -1,22 +1,26 @@
 <template>
     <div id="game-console">
-        <app-profile />
+        <div class="nav-main">
+            <router-link to="/game/profile/">Character</router-link> | 
+            <router-link to="/game/dungeons/">Dungeons</router-link>
+        </div>
         <button type="button"
-            class="btn btn-info"
-            @click.prevent="signout()">SIGN OUT</button>
+            class="btn btn-info btn-logout"
+            @click.prevent="signout()">LOGOUT</button>
+            <router-view></router-view>
     </div>
 </template>
 
 <script>
 import { mapActions } from 'vuex';
-import Profile from './Profile'
+import ProfileMain from './ProfileMain'
+import SkillsInventory from './SkillsInventory'
 
 export default {
-    components: {
-        'app-profile': Profile
-    }, 
+
     methods: {
         ...mapActions([ 'logout' ]), 
+
         async signout() {
             await this.logout();
             this.$router.push('/');
@@ -34,6 +38,22 @@ export default {
                     -20px -20px 60px #ffffff;
         padding: 20px 30px;
         border: 0.5px solid #ffffff;
+        position: relative;
+        height: 100%;
+    }
+
+    .btn-logout {
+            position: absolute;
+            top: 20px;
+            right: 35px;
+    }
+
+    .nav-main {
+        height: 2.25rem;
+        font-size: 1.25rem;
+        margin-bottom: 20px;
+        text-transform: uppercase;
+        font-weight: 900;
     }
 
 </style>

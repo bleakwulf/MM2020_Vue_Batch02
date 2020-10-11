@@ -55,12 +55,12 @@ export default {
     -moz-osx-font-smoothing: grayscale;
     text-align: center; */
     color: #2c3e50;
-    margin-top: 30px;
   }
 
   .container {
       display: flex;
       flex-flow: row nowrap;
+      height: 100vh !important;
   }
 
   .h-spacer {
@@ -71,6 +71,7 @@ export default {
     padding: 20px;
     flex-grow: 1;
     flex-basis: 45%;
+    height: 100%;
   }
   
   .error {    

@@ -36,6 +36,7 @@ export default {
 </script>
 <style>
     #xp-container {
+        display: block !important;
         width: 100%;
         padding: 0 !important;
         justify-content: left !important;

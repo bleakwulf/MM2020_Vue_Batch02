@@ -14,6 +14,7 @@ const state = {
     characterData: null, 
     computedStats: null,
     inventory: null, 
+    skillsInventory: null, 
     dungeons: null, 
 };
 
@@ -22,7 +23,8 @@ const getters = {
     getAccountId: state => state.accountId,
     getCharacterData: state => state.characterData, 
     getCharacterStats: state => state.user.stats, 
-    getComputedStats: state => state.computedStats
+    getComputedStats: state => state.computedStats,
+    getSkillsInventory: state => state.skillsInventory
 };
 
 const actions = {
@@ -60,7 +62,11 @@ const actions = {
     async loadUserData({ commit, state }) {
         return await axios.get(`${BASE_URL}accounts/${state.accountId}/character`)
             .then( res => {
+                //  per checking, responses from /accounts/:accountid/character and /character/:characterid were congruent
+                //  as such, init state.characterdata as state.user
+                //  modify implementation if previous findings on congruent response no longer holds true
                 commit( MUTATION_TYPES.SET_USER, res.data );
+                commit( MUTATION_TYPES.SET_CHARACTER_DATA, res.data );
             });
     }, 
 
@@ -68,16 +74,20 @@ const actions = {
         await commit( MUTATION_TYPES.LOGOUT_USER );
     }, 
 
-    loadCharacterData({ commit }, payload ) {
-        const { characterId } = payload.data;
-        axios.get(`${BASE_URL}character/${characterId}`)
+    async loadCharacterData({ commit, dispatch, state } ) {
+        const { user: { _id: characterId } } = state;
+        return await axios.get(`${BASE_URL}character/${characterId}`)
         .then( res => { 
             commit( MUTATION_TYPES.SET_CHARACTER_DATA, res.data );
+            dispatch('loadComputedStats');
+            return;
+        }).catch( err =>{
+            console.log(err);
         });
     }, 
 
     async loadComputedStats({ commit, state }) {
-        const { stats, equipment: { weapon: { bonus: weaponBonus }, armor: { bonus: armorBonus } } } = state.user;
+        const { stats, equipment: { weapon: { bonus: weaponBonus }, armor: { bonus: armorBonus } } } = state.characterData;
 
         const computedStats = Object.assign({}, stats);
 
@@ -85,6 +95,15 @@ const actions = {
             computedStats[attr] += weaponBonus[attr] + armorBonus[attr];
         });
         commit( MUTATION_TYPES.SET_COMPUTED_STATS, computedStats )
+    },
+    
+    async loadSkills({ commit, state } ) {
+        const { user: { _id: characterId } } = state;
+        await axios.get(`${BASE_URL}character/${characterId}/skills`)
+            .then( res => { 
+                commit( MUTATION_TYPES.SET_SKILLS_INVENTORY, res.data );
+                return;
+            });
     },
 
     loadInventory({ commit }, payload ) {
@@ -128,6 +147,10 @@ const mutations = {
 
     [MUTATION_TYPES.SET_INVENTORY] (state, payload) {
         state.inventory = payload;
+    },
+
+    [MUTATION_TYPES.SET_SKILLS_INVENTORY] (state, payload) {
+        state.skillsInventory = payload;
     },
 
     [MUTATION_TYPES.SET_DUNGEONS_LIST] (state, payload) {

@@ -21,7 +21,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapGetters, mapActions } from 'vuex';
 import { Attributes } from '../shared/constants/Constants'
 export default {
     data() {
@@ -31,20 +31,31 @@ export default {
             eAttributes: Attributes
         }
     },
+
     methods: {
+        ...mapActions([ 'loadCharacterData' ]), 
+
         getItemsEffect: function(attr) {
             const attrDiff = this.computedStats[attr] - this.originalStats[attr];
             return attrDiff > 0 ? `+${attrDiff}` 
                 : attrDiff === 0 ? '' : attrDiff;
         }
     },
+
     computed: {
         ...mapGetters([ 'getCharacterStats', 'getComputedStats' ]), 
+
         attrList: function() {
             return Object.keys(this.computedStats)
         }, 
     },
-    created() {
+
+    async created() {
+        // await this.loadCharacterData()
+        //     .then( re => {
+        //         this.originalStats = this.getCharacterStats,
+        //         this.computedStats = this.getComputedStats
+        //     });
         this.originalStats = this.getCharacterStats,
         this.computedStats = this.getComputedStats
     }
@@ -75,26 +86,38 @@ export default {
         display: flex;
         flex-flow: row nowrap;
         justify-content: center;
+        padding: 0 20px;
     }
+
+    .attr-detail:nth-child(odd) {
+        background-color: #f5f5f5;
+    }
+
     .attr-header {
         font-weight: bold;
         text-transform: uppercase;
     } 
 
     .attr-header div:first-child {
-        width: 60%;
+        width: 40%;
         align-content: flex-start;
     } 
 
     .attr-detail div:first-child {
-        width: 60%;
+        width: 40%;
         align-content: flex-start;
         text-align: left;
+        font-weight: 500;
     }
 
     .attr-header div:not(:first-child), 
     .attr-detail div:not(:first-child) {
-        width: 20%;
+        width: 30%;
+    }
+    
+
+    .attr-detail div:last-child {
+        font-weight: bold;
     }
 
     .attr-increase {

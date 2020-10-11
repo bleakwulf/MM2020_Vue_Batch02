@@ -155,6 +155,7 @@ export default {
 
     methods: {
         ...mapActions([ 'register' ]), 
+
         async save() {
             const payload = { ...this.accountData, 
                 classType: this.eCharacterClass[this.accountData.classType.toUpperCase()]
@@ -191,6 +192,7 @@ export default {
     .signup {
       display: flex;
       flex-flow: row nowrap;
+      height: 100%;
     }
 
     .signup-form {

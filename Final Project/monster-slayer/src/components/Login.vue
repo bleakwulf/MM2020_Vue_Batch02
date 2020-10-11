@@ -55,6 +55,7 @@ export default {
             }
         }
     }, 
+
     validations: {
         loginData: {
             username: {
@@ -65,28 +66,32 @@ export default {
             }
         }
     },
+
     methods: {
-        ...mapActions([ 'login', 'logout']),
+        ...mapActions([ 'login', 'logout']), 
+
         signin() {
             // this.login(this.loginData);
             this.login(this.loginData)
                 .then( res => {
-                    this.$router.push('/game')
+                    // this.$router.push('/game')
+                    this.$router.push('/game/profile')
                 }).catch( error =>
                     alert(error)
                 );
         }, 
+
         signup: function() {
             this.$router.push('/register')
         }, 
     }, 
+
     computed: {
         ...mapGetters({ 
             accountId: 'getAccountId', 
             userdata: 'getUser'
         })
     }
-
 }
 </script>
 
@@ -94,6 +99,7 @@ export default {
     .login {
       display: flex;
       flex-flow: row nowrap;
+      height: 100%;
     }
 
     .login-form {

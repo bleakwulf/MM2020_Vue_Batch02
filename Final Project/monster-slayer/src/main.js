@@ -4,6 +4,13 @@ import Vuelidate from 'vuelidate';
 import VueRouter from 'vue-router';
 import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { faMinusCircle, faPlusCircle } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+ 
+library.add(faMinusCircle, faPlusCircle);
+
+Vue.component('font-awesome-icon', FontAwesomeIcon);
 
 import store from './store';
 
