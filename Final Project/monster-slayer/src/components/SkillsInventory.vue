@@ -60,6 +60,10 @@
                     <div>{{ `${selectedSkill.cost} mana` }}</div>
                 </div>
                 <div class="field-row">
+                    <div>Target</div>
+                    <div>{{ helpers.toProperCase(selectedSkill.target) }}</div>
+                </div>
+                <div class="field-row">
                     <div>{{ getEffectLabel(selectedSkill) }}</div>
                     <div>{{ getEffectDescription(selectedSkill) }}</div>
                 </div>
@@ -70,12 +74,17 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex';
+
+//  helpers
+import * as HELPERS from '../shared/helpers/Helpers.js'
+
 export default {
     data() {
         return {
             skillsInventory: [],
             selectedSkillSet: null,
-            selectedSkill: null
+            selectedSkill: null, 
+            helpers: HELPERS
         }
     },
 
@@ -213,7 +222,8 @@ export default {
         display: flex;
         flex-flow: row nowrap;
         justify-content: flex-start;
-        text-align: left;    
+        text-align: left; 
+        font-size: 14px;
         margin-bottom: 3px;
         padding: 6px 0;
         border-bottom: 0.5px solid #f2f3f4;

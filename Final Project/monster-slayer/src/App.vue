@@ -85,4 +85,8 @@ export default {
   .action-buttons button:not(:first-child) {
       margin-left: 10px;
   }
+
+  .info-icon {
+    color: #3333FF;
+  }
 </style>

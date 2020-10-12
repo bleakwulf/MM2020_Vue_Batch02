@@ -27,14 +27,8 @@ export const routes = [
 
                     }, 
                     {
-                        path: 'inventory', 
-                        component: Inventory,
-                        children: [
-                            {
-                                path: '', 
-                                component: SkillsInventory
-                            }
-                        ]
+                        path: 'skills', 
+                        component: SkillsInventory
                     }
                 ]
             }, 

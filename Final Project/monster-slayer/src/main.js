@@ -5,10 +5,22 @@ import VueRouter from 'vue-router';
 import 'bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faMinusCircle, faPlusCircle } from '@fortawesome/free-solid-svg-icons'
+import { 
+    faMinusCircle, 
+    faPlusCircle,
+    faLock,
+    faInfoCircle, 
+    faExclamationTriangle
+} from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
  
-library.add(faMinusCircle, faPlusCircle);
+library.add(
+  faMinusCircle, 
+  faPlusCircle,
+  faLock, 
+  faInfoCircle, 
+  faExclamationTriangle
+);
 
 Vue.component('font-awesome-icon', FontAwesomeIcon);
 

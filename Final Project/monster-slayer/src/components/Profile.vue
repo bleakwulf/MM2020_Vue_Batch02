@@ -2,7 +2,7 @@
     <div>
         <div class="profile-menu">
             <router-link to="/game/profile/">Profile</router-link> | 
-            <router-link to="/game/profile/inventory/">Inventory</router-link>
+            <router-link to="/game/profile/skills/">Skills</router-link>
         </div>
         <router-view></router-view>
     </div>

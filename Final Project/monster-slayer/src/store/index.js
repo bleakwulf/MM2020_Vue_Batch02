@@ -24,7 +24,8 @@ const getters = {
     getCharacterData: state => state.characterData, 
     getCharacterStats: state => state.user.stats, 
     getComputedStats: state => state.computedStats,
-    getSkillsInventory: state => state.skillsInventory
+    getSkillsInventory: state => state.skillsInventory, 
+    getDungeons: state => state.dungeons
 };
 
 const actions = {
@@ -106,19 +107,22 @@ const actions = {
             });
     },
 
-    loadInventory({ commit }, payload ) {
-        const { characterId } = payload.data;
-        axios.get(`${BASE_URL}character/${characterId}/inventory`)
-        .then( res => { 
-            commit( MUTATION_TYPES.SET_DUNGEONS_LIST, res.data );
-        });
+    async loadInventory({ commit }, payload ) {
+        const { user: { _id: characterId } } = state;
+        await axios.get(`${BASE_URL}character/${characterId}/inventory`)
+            .then( res => { 
+                commit( MUTATION_TYPES.SET_DUNGEONS_LIST, res.data );
+                return;
+            });
     },
 
-    loadDungeons({ commit }) {
-        axios.get(`${BASE_URL}dungeons`)
-        .then( res => { 
-            commit( MUTATION_TYPES.SET_DUNGEONS_LIST, res.data );
-        });
+    async loadDungeons({ commit }) {
+        const { user: { _id: characterId } } = state;
+        await axios.get(`${BASE_URL}character/${characterId}/dungeons`)
+            .then( res => { 
+                commit( MUTATION_TYPES.SET_DUNGEONS_LIST, res.data );
+                return;
+            });
     }
 
 };
@@ -154,7 +158,7 @@ const mutations = {
     },
 
     [MUTATION_TYPES.SET_DUNGEONS_LIST] (state, payload) {
-        state.dungeons = payload.dungeons;
+        state.dungeons = payload;
     }
 }
 
