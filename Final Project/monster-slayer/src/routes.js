@@ -3,7 +3,7 @@ import Register from './components/Register.vue';
 import GameConsole from './components/GameConsole.vue';
 import Profile from './components/Profile.vue'
 import ProfileMain from './components/ProfileMain.vue'
-import Inventory from './components/Inventory.vue';
+import ItemsInventory from './components/ItemsInventory.vue';
 import SkillsInventory from './components/SkillsInventory.vue';
 import Dungeons from './components/Dungeons.vue';
 
@@ -29,6 +29,10 @@ export const routes = [
                     {
                         path: 'skills', 
                         component: SkillsInventory
+                    }, 
+                    {
+                        path: 'inventory', 
+                        component: ItemsInventory
                     }
                 ]
             }, 

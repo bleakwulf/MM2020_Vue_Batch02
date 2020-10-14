@@ -1,7 +1,7 @@
 <template>
     <div id="dungeon-panel">
         <div class="dungeons-list">
-            <div v-for="dungeon in getDungeons"
+            <div v-for="dungeon in dungeons"
                 :key="dungeon._id"
                 class="dungeon-tile" 
                 :class="{ 'is-selected' : !!selectedDungeon && selectedDungeon._id === dungeon._id }"
@@ -57,7 +57,7 @@
 
                 <div v-if="!selectedDungeon.locked"
                     class="fixed-bottom-action">
-                    <button type="button">ENTER</button>
+                    <button type="button" @click="enterSelectedDungeon()">ENTER</button>
                 </div>
 
             </div>
@@ -76,7 +76,10 @@ export default {
     },
 
     methods: {
-        ...mapActions([ 'loadDungeons' ]), 
+        ...mapActions([ 
+            'loadDungeons', 
+            'enterDungeon'
+        ]), 
 
         setDungeonCardDisplay: function(dungeon) {
             this.selectedDungeon = dungeon;
@@ -88,6 +91,13 @@ export default {
 
         getDungeonBoss: function() {
             return this.selectedDungeon.enemies.filter( enemy => enemy.boss);
+        }, 
+
+        enterSelectedDungeon: function() {
+            this.enterDungeon({ dungeonId: this.selectedDungeon._id })
+                .then( res => {
+                    // this.$router.push('/game/encounter');
+                });
         }
     }, 
 
@@ -104,6 +114,7 @@ export default {
         //  sort dungeons per recommended level
         if (this.dungeons && this.dungeons.length > 0) {
             this.dungeons = this.dungeons.sort( (a, b) => a.recommendedLevel > b.recommendedLevel ? 1 : -1);
+            this.selectedDungeon = this.dungeons[0];
         }
     }
 
@@ -269,11 +280,21 @@ export default {
         padding: 13px 20px;
         border-radius: 15px;
         min-width: 150px;
+        font-weight: bold;
+        color: #a0a0a0;
     }
 
-    
+    .dungeon-details .fixed-bottom-action button:active {
+        background: linear-gradient(145deg, #e6e6e6, #ffffff);
+    }
+
+    .dungeon-details .fixed-bottom-action button:active,
+    .dungeon-details .fixed-bottom-action button:hover {
+        color: #00E800;
+    }
+
     .dungeon-details .fixed-bottom-action button:focus {
-        outline: none;
+        outline: none
     }
 
 

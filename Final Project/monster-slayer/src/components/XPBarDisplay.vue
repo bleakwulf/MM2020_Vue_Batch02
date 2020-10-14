@@ -17,16 +17,22 @@ export default {
     },
     methods: {
         getTooltip: function() {
-            return `need ${this.xpToLevelUp} XP to level up`
+            return this.isMaxedXp ? `XP maxed at ${this.profile.totalExp}`
+                : `need ${this.xpToLevelUp} XP to level up`
         }
     }, 
     computed: {
         ...mapGetters([ 'getUser' ]), 
         xpGained: function() {
-            return this.profile.totalExp * 100 / this.profile.nextLevelExp
+            return this.isMaxedXp ? 100 
+                :this.profile.totalExp * 100 / this.profile.nextLevelExp
         },
+
         xpToLevelUp: function() {
             return this.profile.nextLevelExp - this.profile.totalExp
+        }, 
+        isMaxedXp: function() {
+            return this.profile.nextLevelExp === 0;
         }
     }, 
     created() {

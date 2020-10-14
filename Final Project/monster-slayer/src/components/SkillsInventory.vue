@@ -7,7 +7,7 @@
                     :key="idx"
                     class="skill" 
                     :class="{ 'selected' : !!skill && isSelectedSkill(skill, 1) }"
-                    @click="showSkillDetails(skill, 1)">
+                    @click="!!skill ? showSkillDetails(skill, 1) : null">
                     <div>{{ !!skill ? skill.name : '-----' }}</div>
                     <div>
                         <button type="button"
@@ -34,7 +34,8 @@
                             <button type="button" 
                                 class="equip-skill" 
                                 title="Equip this skill"
-                                @click.prevent="equipSkill(skill)">
+                                @click.prevent="equipSkill(skill)"
+                                :disabled="isFullSkillsSlot || !isCompatibleSkill(skill)">
                                 <font-awesome-icon :icon="['fas', 'plus-circle']" size="sm" />
                             </button>
                         </div>
@@ -67,6 +68,30 @@
                     <div>{{ getEffectLabel(selectedSkill) }}</div>
                     <div>{{ getEffectDescription(selectedSkill) }}</div>
                 </div>
+
+                <div v-if="isSkillAvailable() && ( isFullSkillsSlot || !isCompatibleSkill(selectedSkill) )" 
+                    class="fixed-bottom-action">
+                    <span class="skill-warning">
+                        <font-awesome-icon :icon="['fas', 'exclamation-triangle']" size="1x"/>
+                    </span> {{ getSkillWarning() }}
+                </div>
+
+                <div v-if="isSkillAvailable() && !isFullSkillsSlot && isCompatibleSkill(selectedSkill)" 
+                    class="fixed-bottom-action">
+                    <button type="button" 
+                        v-if="isSkillAvailable()"
+                        @click="equipSkill(selectedSkill)"
+                        class="equip">EQUIP</button>
+                </div>
+
+                <div v-if="!isSkillAvailable() && isCompatibleSkill(selectedSkill)" 
+                    class="fixed-bottom-action">
+                    <button type="button" 
+                        v-if="!isSkillAvailable()"
+                        @click="unequipSkill(selectedSkill)"
+                        class="unequip">UNEQUIP</button>
+                </div>
+
             </div>
         </div>
     </div>
@@ -81,7 +106,6 @@ import * as HELPERS from '../shared/helpers/Helpers.js'
 export default {
     data() {
         return {
-            skillsInventory: [],
             selectedSkillSet: null,
             selectedSkill: null, 
             helpers: HELPERS
@@ -89,28 +113,51 @@ export default {
     },
 
     methods: {
-        ...mapActions([ 'loadCharacterData', 'loadSkills' ]),
+        ...mapActions([ 'loadCharacterData', 'loadSkills', 'updateSkills' ]),
 
         isCompatibleSkill: function(skill) {
             return skill.classId === this.getCharacterData.classType;
         }, 
 
-        unequipSkill: function(skill) {
-            console.log(`Unequip ${skill.name}`);
+        unequipSkill: async function(skill) {
+            const payload = this.equippedSkills
+                .filter( equippedSkill => !!equippedSkill ) // remove null skills used as padding
+                .filter( equippedSkill => equippedSkill._id !== skill._id) 
+                .map( equippedSkill => equippedSkill._id );
+
+            await this.updateSkills(payload);
         }, 
 
-        equipSkill: function(skill) {
-            console.log(`Equip ${skill.name}`);
+        equipSkill: async function(skill) {
+            const payload = [ 
+                ...this.equippedSkills
+                    .filter( equippedSkill => !!equippedSkill ) // remove null skills used as padding
+                    .map( equippedSkill => equippedSkill._id ), 
+                skill._id 
+                ];
+            await this.updateSkills(payload);
         }, 
 
         isSelectedSkill: function(skill, origin) {
-            return (origin === this.selectedSkillSet && !!this.selectedSkill && skill._id === this.selectedSkill._id);
+            return (!!this.selectedSkill && skill._id === this.selectedSkill._id);
         }, 
+
+        isSkillAvailable: function() {
+            return this.availableSkills
+                .map( skill => skill._id )
+                .includes(this.selectedSkill._id);
+        },
 
         showSkillDetails: function( skill, origin ) {
             this.selectedSkillSet = origin; // 1: equipped skills, 2: available skills
             this.selectedSkill = skill;
         },
+
+        getSkillWarning() {
+            return this.isFullSkillsSlot ? `Can't equip this item, your skill capacity is already full.`
+                : !this.isCompatibleSkill(this.selectedSkill) ? `Can't equip skill, skill is not suited to your character class type.`
+                : '';
+        }, 
 
         getEffectLabel: function(skill) {
             return skill.target === 'self' ? 'Heal' : 'Damage';
@@ -128,13 +175,12 @@ export default {
         ...mapGetters([ 'getCharacterData', 'getSkillsInventory' ]), 
 
         equippedSkills: function() {
-            const equippedSkillIds = this.getCharacterData.skills .map( skill => skill._id );
+            const equippedSkillIds = this.getCharacterData.skills.map( skill => skill._id );
             const equippedSkills = !this.getSkillsInventory ? []
-                    : equippedSkillIds.length === 0 ? this.getSkillsInventory
                     : this.getSkillsInventory.filter( skill => equippedSkillIds.includes(skill._id) );
 
             const equippedSkillsCount = equippedSkills.length;
-            if (equippedSkillsCount !== process.env.VUE_APP_MAX_SKILL_EQUIP) {
+            if (equippedSkillsCount < process.env.VUE_APP_MAX_SKILL_EQUIP) {
                 equippedSkills.length = process.env.VUE_APP_MAX_SKILL_EQUIP;
                 equippedSkills.fill(null, equippedSkillsCount);
             }
@@ -144,9 +190,10 @@ export default {
         }, 
 
         equippedSkillsCount: function() {
-            const equippedSkillIds = this.getCharacterData.skills .map( skill => skill._id );
+            const equippedSkillIds = this.getCharacterData.skills.map( skill => skill._id );
+
             const equippedSkills = !this.getSkillsInventory ? []
-                    : equippedSkillIds.length === 0 ? this.getSkillsInventory
+                    : equippedSkillIds.length === 0 ? []
                     : this.getSkillsInventory.filter( skill => equippedSkillIds.includes(skill._id) );
 
             return equippedSkills.length;
@@ -160,7 +207,7 @@ export default {
         },
 
         isFullSkillsSlot: function() {
-            return this.getCharacterData.skills .map( skill => skill._id ) === process.env.VUE_APP_MAX_SKILL_EQUIP;
+            return this.equippedSkillsCount >= process.env.VUE_APP_MAX_SKILL_EQUIP;
         }
 
     },
@@ -169,7 +216,9 @@ export default {
         this.loadCharacterData();
         await this.loadSkills()
             .then( res => {
-                this.skillsInventory = this.getSkillsInventory
+                this.selectedSkill = this.equippedSkills.length > 0 ? this.equippedSkills[0]
+                    : this.availableSkills > 0 ? this.availableSkills[0]
+                    : null;
             });
     }
 
@@ -192,15 +241,17 @@ export default {
         padding: 20px;
         display: flex;
         flex-flow: column nowrap;
-        justify-content: center;
+        justify-content: flex-start;
         text-align: center;
+        position: relative;
+        height: 100%;
     }
 
     .skills-details {
         flex: 1;
         border-radius: 10px;
         background: #ffffff;
-        margin-bottom: 20px;
+        margin-bottom: 22px;
         margin-left: 10px;
         margin-right: 5px;
         box-shadow: inset 5px 5px 25px #d9d9d9, 
@@ -260,6 +311,7 @@ export default {
         border-bottom: 1px solid seagreen;
         margin-bottom: 10px;
     }
+
     .skills-available {
         height: 200px;
     }
@@ -320,8 +372,56 @@ export default {
         border: 0;
     }
     
+    .equip-skill:disabled { 
+        color: grey;
+    }
+    
     .equip-skill:focus, 
+    .equip-skill:disabled:focus, 
     .unequip-skill:focus {
         outline: 0;
+    }
+
+    .fixed-bottom-action {
+        position: absolute;
+        bottom: 20px;
+        font-weight: 500;
+        text-align: center;
+        width: 100%;
+        right: 0;
+    }
+
+    .fixed-bottom-action button {
+        border: 0;
+        background: linear-gradient(145deg, #ffffff, #e6e6e6);
+        box-shadow: 12px 12px 37px #a1a1a1, 
+                    -12px -12px 37px #ffffff;
+        padding: 13px 20px;
+        border-radius: 15px;
+        min-width: 150px;
+        font-weight: bold;
+        color: #a0a0a0;
+    }
+
+    .fixed-bottom-action button:active {
+        background: linear-gradient(145deg, #e6e6e6, #ffffff);
+    }
+
+    .fixed-bottom-action button.equip:active,
+    .fixed-bottom-action button.equip:hover {
+        color: #00E800;
+    }
+    
+    .fixed-bottom-action button.unequip:active,
+    .fixed-bottom-action button.unequip:hover {
+        color: #F80000;
+    }
+
+    .skill-warning {
+        color: goldenrod;
+    }
+
+    .fixed-bottom-action button:focus {
+        outline: none;
     }
 </style>

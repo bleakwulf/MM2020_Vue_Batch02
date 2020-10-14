@@ -16,16 +16,19 @@ const state = {
     inventory: null, 
     skillsInventory: null, 
     dungeons: null, 
+    matchData: null,
 };
 
 const getters = {
-    getUser:  state => state.user,
-    getAccountId: state => state.accountId,
-    getCharacterData: state => state.characterData, 
-    getCharacterStats: state => state.user.stats, 
-    getComputedStats: state => state.computedStats,
+    getUser:            state => state.user,
+    getAccountId:       state => state.accountId,
+    getCharacterData:   state => state.characterData, 
+    getCharacterStats:  state => state.user.stats, 
+    getComputedStats:   state => state.computedStats,
     getSkillsInventory: state => state.skillsInventory, 
-    getDungeons: state => state.dungeons
+    getInventory:       state => state.inventory, 
+    getDungeons:        state => state.dungeons,
+    getMatchData:       state => state.matchData
 };
 
 const actions = {
@@ -111,7 +114,7 @@ const actions = {
         const { user: { _id: characterId } } = state;
         await axios.get(`${BASE_URL}character/${characterId}/inventory`)
             .then( res => { 
-                commit( MUTATION_TYPES.SET_DUNGEONS_LIST, res.data );
+                commit( MUTATION_TYPES.SET_INVENTORY, res.data );
                 return;
             });
     },
@@ -123,7 +126,45 @@ const actions = {
                 commit( MUTATION_TYPES.SET_DUNGEONS_LIST, res.data );
                 return;
             });
-    }
+    },
+
+    async enterDungeon({ commit, dispatch, state }, payload ) {
+        const { dungeonId } = payload;
+
+        // reload computed stats for integrity, e.g., level up at end of last match and confirmed re-entering the dungeon 
+        await dispatch('loadCharacterData', payload );
+        return await axios.post(`${BASE_URL}dungeons/enter`, {
+                characterId: state.characterData._id,
+                dungeonId
+            }).then( res => {
+                const { dungeon, enemy: p2 } = res.data;
+                const { skills, _id, name, level } = state.characterData;
+                const matchData = {
+                    dungeon,
+                    p1: {
+                        stats: state.computedStats, 
+                        skills, 
+                        _id, 
+                        name, 
+                        level
+                    },
+                    p2
+                };
+
+                commit( MUTATION_TYPES.SET_MATCH_DATA, matchData );
+                return;
+            })
+    },
+    
+    async updateSkills({ commit, dispatch, state }, payload ) {
+        const { user: { _id: characterId } } = state;
+        await axios.put(`${BASE_URL}character/${characterId}/skills`, payload)
+            .then( res => { 
+                dispatch('loadCharacterData');
+                // commit( MUTATION_TYPES.SET_SKILLS_INVENTORY, res.data );
+                return;
+            });
+    },
 
 };
 
@@ -159,6 +200,10 @@ const mutations = {
 
     [MUTATION_TYPES.SET_DUNGEONS_LIST] (state, payload) {
         state.dungeons = payload;
+    }, 
+
+    [MUTATION_TYPES.SET_MATCH_DATA] (state, payload) {
+        state.matchData = payload;
     }
 }
 
