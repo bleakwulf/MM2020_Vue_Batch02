@@ -137,18 +137,40 @@ const actions = {
                 characterId: state.characterData._id,
                 dungeonId
             }).then( res => {
-                const { dungeon, enemy: p2 } = res.data;
-                const { skills, _id, name, level } = state.characterData;
+                const { dungeon, enemy } = res.data;
+                const { skills, _id, name, level, classType } = state.characterData;
+
+                console.log(process.env.VUE_APP_APPLY_MP_HANDICAP);
+                console.log(process.env.VUE_APP_MP_HANDICAP_LIMIT);
+                
+                let p2 = Object.assign( {}, enemy);
+                p2.stats = { ...enemy.stats, 
+                    mana: process.env.VUE_APP_APPLY_MP_HANDICAP 
+                        ? enemy.stats.mana * process.env.VUE_APP_MP_HANDICAP_LIMIT / 100 
+                        : enemy.stats.mana, 
+                    maxHp: enemy.stats.health,
+                    maxMp: enemy.stats.mana
+                }
+                
                 const matchData = {
                     dungeon,
                     p1: {
-                        stats: state.computedStats, 
+                        stats: {
+                            ...state.computedStats, 
+                            mana: process.env.VUE_APP_APPLY_MP_HANDICAP 
+                                ? state.computedStats.mana * process.env.VUE_APP_MP_HANDICAP_LIMIT / 100 
+                                : state.computedStats.mana, 
+                            maxHp: state.computedStats.health,
+                            maxMp: state.computedStats.mana
+                        }, 
                         skills, 
                         _id, 
                         name, 
-                        level
+                        level, 
+                        classType
                     },
-                    p2
+                    p2, 
+                    povTurn: 1  // player 1 has default turn
                 };
 
                 commit( MUTATION_TYPES.SET_MATCH_DATA, matchData );
@@ -161,10 +183,90 @@ const actions = {
         await axios.put(`${BASE_URL}character/${characterId}/skills`, payload)
             .then( res => { 
                 dispatch('loadCharacterData');
-                // commit( MUTATION_TYPES.SET_SKILLS_INVENTORY, res.data );
                 return;
             });
     },
+
+    async processSkillMove({ commit, dispatch, state }, payload) {
+        console.log(payload)
+        const { povSource, skillWielded } = payload;
+
+        //  identify skill wielder and target 
+        const isTargetSelf = skillWielded.target === 'self';
+        const isFocusSkill = isTargetSelf && skillWielded._id.endsWith('__FOCUS' );
+        const p1 = Object.assign({}, povSource === 1 ? state.matchData.p1.stats : state.matchData.p2.stats);
+        // const p2 = isTargetSelf ? null  // Object.assign({}, p1) 
+        //     : Object.assign({}, povSource === 1 ? state.matchData.p2.stats : state.matchData.p1.stats);
+        const p2 = Object.assign({}, povSource === 1 ? state.matchData.p2.stats : state.matchData.p1.stats);
+
+        //  calculate base damage
+        const baseDamage = skillWielded.type === 'P' ? ( skillWielded.damage / 100 ) * p1.off   // physical attacks as % of wielder' offense
+            : isFocusSkill ? p1.int * process.env.VUE_APP_FOCUS_GAIN_PERCENTAGE / 100           // focus as default % from wielder' intelligence
+            : ( skillWielded.damage / 100 ) * p1.int;                                           // magical attacks as % of wielder' intelligence
+
+        //  check luck factor for critical hit
+        const isHitSuccess = isTargetSelf ? true                        // self-targetted skill never fails
+            : Math.random() < (p1.agi / 100) * (baseDamage / 100);      // TO DO: further formulate chance to land hit
+
+        const isCriticalHit = isTargetSelf ? false 
+            : Math.random() < p1.luk;
+        
+        //  calculate enemy evasion factors using their stats.agi
+        //  NOTE: enemy can only evade magical attacks thru their luck factor
+        const p2LuckFactor = isTargetSelf ? false 
+            : Math.random() < p2.luk;
+        const p2EvadeFactor = isTargetSelf ? false :
+            Math.random() <= (p2.agi / 100) * (baseDamage / 100);   // TO DO: further formulate chance to evade physical attack
+        const isEvade = isTargetSelf ? false
+            : skillWielded.type === 'M' ? p2LuckFactor : p2EvadeFactor; 
+
+        const defenseFactor = isTargetSelf || isEvade ? 0                       // no need to calculate if target is self or enemy can evade attack
+            : skillWielded.type === 'P' ? (p2.health / p2.maxHp) * p2.def       // defense as % of target's physical constitution
+            : (p2.mana / p2.maxMp) * p2.def;                                    // defense as % of target's mana constitution
+
+        // calculate total damage
+        const totalDamage = (isHitSuccess && !isEvade) 
+            ? Math.ceil(
+                ( isCriticalHit ? baseDamage * process.env.VUE_APP_LUCK_MULTIPLIER : baseDamage ) 
+                - ( defenseFactor < 0 ? 0 : defenseFactor )
+            ) : 0;
+
+        //  calculate effect
+        p1.mana     -= isTargetSelf && isFocusSkill ? 0 - baseDamage : skillWielded.cost;
+        p1.health   += isTargetSelf ? Math.abs(baseDamage) : 0;
+        p2.health   -= !isTargetSelf ? baseDamage : 0;
+
+        //  clear out of bound stats
+        p1.mana     = p1.mana < 0   ? 0 : p1.mana > p1.maxMp    ? p1.maxMp : p1.mana;
+        p1.health   = p1.health < 0 ? 0 : p1.health > p1.maxHp  ? p1.maxHp : p1.health;
+        p2.health   = p2.health < 0 ? 0 : p2.health > p2.maxHp  ? p2.maxHp : p2.health;
+
+        //  identify end game and/or turn switch
+        const isEndGame = p1.health === 0 || p2.health === 0;
+        const povTurn = isEndGame ? 0
+            : povSource === 1 ? 2 : 1;
+
+        //  return skill result
+        const newPayload = {
+            p1: povSource === 1 ? 
+                {
+                    mana: p1.mana,
+                    health: p1.health
+                } : {
+                    health: p2.health
+                }, 
+            p2: povSource === 2 ? 
+                {
+                    mana: p1.mana,
+                    health: p1.health
+                } : {
+                    health: p2.health
+                },
+            povTurn
+        }
+
+        commit( MUTATION_TYPES.SET_SKILLS_EFFECT, newPayload );
+    }
 
 };
 
@@ -204,6 +306,18 @@ const mutations = {
 
     [MUTATION_TYPES.SET_MATCH_DATA] (state, payload) {
         state.matchData = payload;
+    }, 
+
+    [MUTATION_TYPES.SET_SKILLS_EFFECT] (state, payload) {
+        const { p1: p1Stats, p2: p2Stats, povTurn } = payload;
+
+        if (p1Stats.mana)   state.matchData.p1.stats.mana   = p1Stats.mana;
+        if (p1Stats.health) state.matchData.p1.stats.health = p1Stats.health;
+        if (p2Stats.mana)   state.matchData.p2.stats.mana   = p2Stats.mana;
+        if (p2Stats.health) state.matchData.p2.stats.health = p2Stats.health;
+              
+        state.matchData.povTurn = povTurn;
+
     }
 }
 

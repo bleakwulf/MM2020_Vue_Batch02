@@ -32,7 +32,7 @@
 <script>
 import { mapGetters } from 'vuex';
 //  constants
-import { CharacterClass } from '../shared/constants/Constants.js';
+import { CHARACTER_CLASS } from '../shared/constants/Constants.js';
 
 //  helpers
 import * as HELPERS from '../shared/helpers/Helpers.js'
@@ -50,7 +50,7 @@ export default {
     data() {
         return {
             profile: null, 
-            eCharacterClass: CharacterClass
+            eCharacterClass: CHARACTER_CLASS
         }
     }, 
 
@@ -58,14 +58,14 @@ export default {
         ...mapGetters([ 'getUser']),
 
         characterClasses: function() {            
-            return Object.keys(CharacterClass)
+            return Object.keys(CHARACTER_CLASS)
                 .filter(x => !(parseInt(x) >= 0))
                 .map( (charaClass) => {
                     return { 
                         id: this.eCharacterClass[charaClass], 
                         name: HELPERS.toProperCase( charaClass  )
                     }
-                })
+                });
         },
 
         classType: function() {
@@ -74,7 +74,6 @@ export default {
         },
 
         imgSrc: function() {
-            // return `../assets/class/${this.classType.toLowerCase()}.png`
             return `${this.classType.toLowerCase()}.png`
         }
     }, 
@@ -86,6 +85,7 @@ export default {
 
 }
 </script>
+
 <style>
 
     #profile-panel {

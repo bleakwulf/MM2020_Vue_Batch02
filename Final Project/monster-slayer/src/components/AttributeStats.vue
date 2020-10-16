@@ -22,13 +22,13 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex';
-import { Attributes } from '../shared/constants/Constants'
+import { ATTRIBUTES } from '../shared/constants/Constants'
 export default {
     data() {
         return {
             originalStats: null, 
             computedStats: null,
-            eAttributes: Attributes
+            eAttributes: ATTRIBUTES
         }
     },
 
@@ -51,11 +51,6 @@ export default {
     },
 
     async created() {
-        // await this.loadCharacterData()
-        //     .then( re => {
-        //         this.originalStats = this.getCharacterStats,
-        //         this.computedStats = this.getComputedStats
-        //     });
         this.originalStats = this.getCharacterStats,
         this.computedStats = this.getComputedStats
     }

@@ -1,4 +1,4 @@
-export const CharacterClass = {
+export const CHARACTER_CLASS = {
     SABER:      1,
     ARCHER:     2, 
     LANCER:     3, 
@@ -6,7 +6,7 @@ export const CharacterClass = {
     CASTER:     5 
 }
 
-export const Attributes = {
+export const ATTRIBUTES = {
     health  : { propName: 'health', displayName: 'Health' }, 
     mana    : { propName: 'mana',   displayName: 'Mana'},
     off     : { propName: 'off',    displayName: 'Offense' }, 

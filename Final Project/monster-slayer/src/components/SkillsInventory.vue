@@ -33,7 +33,7 @@
                         <div>
                             <button type="button" 
                                 class="equip-skill" 
-                                title="Equip this skill"
+                                :title="isFullSkillsSlot || !isCompatibleSkill(skill) ? '' : `Equip this skill` "
                                 @click.prevent="equipSkill(skill)"
                                 :disabled="isFullSkillsSlot || !isCompatibleSkill(skill)">
                                 <font-awesome-icon :icon="['fas', 'plus-circle']" size="sm" />
@@ -374,6 +374,7 @@ export default {
     
     .equip-skill:disabled { 
         color: grey;
+        cursor: not-allowed;
     }
     
     .equip-skill:focus, 

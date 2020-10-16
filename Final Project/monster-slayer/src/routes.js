@@ -6,6 +6,7 @@ import ProfileMain from './components/ProfileMain.vue'
 import ItemsInventory from './components/ItemsInventory.vue';
 import SkillsInventory from './components/SkillsInventory.vue';
 import Dungeons from './components/Dungeons.vue';
+import Battleground from './components/Battleground.vue';
 
 export const routes = [
     {
@@ -40,6 +41,11 @@ export const routes = [
                 name: 'dungeons',
                 path: 'dungeons', 
                 component: Dungeons
+            }, 
+            {
+                name: 'encounter',
+                path: 'encounter', 
+                component: Battleground
             }
         ]
     },

@@ -96,13 +96,14 @@ export default {
         enterSelectedDungeon: function() {
             this.enterDungeon({ dungeonId: this.selectedDungeon._id })
                 .then( res => {
-                    // this.$router.push('/game/encounter');
+                    this.$router.push('/game/encounter');
                 });
         }
     }, 
 
     computed: {
-        ...mapGetters([ 'getDungeons' ])
+        ...mapGetters([ 'getDungeons', 
+            'getMatchData' ])
     }, 
 
     async created() {
@@ -130,7 +131,6 @@ export default {
     .dungeons-list {
         flex: 1;
         overflow-y: scroll;
-        /* height: 450px; */
         height: calc(100vh - 160px);
         display: flex;
         flex-flow: column nowrap;
@@ -162,18 +162,21 @@ export default {
         width: 300px;
         position: relative;
         margin: 15px 0;
+        border-radius: 10px;
     }
 
     .dungeon-tile.is-selected {
         background: #e8ee9b;
         box-shadow:  10px 10px 20px #c5ca84, 
                     -10px -10px 20px #ffffb2;
+        border-radius: 10px;
     }
 
     .dungeon-tile img.dungeon-tile-img {
         height: 150px !important;
         width: 300px !important;
         position: relative;
+        border-radius: 10px;
     }
     
     .dungeon-lock {
@@ -188,6 +191,7 @@ export default {
         display: flex;
         align-items: center;
         justify-content: center;
+        border-radius: 10px;
     }
 
     .dungeon-card {
@@ -211,7 +215,7 @@ export default {
     }
 
     .dungeon-card .locked-message {
-        margin-top: 10px;
+        margin-top: 20px;
     }
     
     .dungeon-details {

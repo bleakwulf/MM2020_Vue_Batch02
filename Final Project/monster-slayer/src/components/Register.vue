@@ -105,7 +105,7 @@ import { mapActions } from 'vuex';
 import { required, minLength, maxLength, email } from 'vuelidate/lib/validators';
 
 //  constants
-import { CharacterClass } from '../shared/constants/Constants.js';
+import { CHARACTER_CLASS } from '../shared/constants/Constants.js';
 
 //  helpers
 import * as HELPERS from '../shared/helpers/Helpers.js'
@@ -121,7 +121,7 @@ export default {
                 characterName: '', 
                 classType: null
             }, 
-            eCharacterClass: CharacterClass
+            eCharacterClass: CHARACTER_CLASS
         }
     }, 
 
@@ -175,7 +175,7 @@ export default {
     
     computed: {
         characterClasses: function() {            
-            return Object.keys(CharacterClass)
+            return Object.keys(CHARACTER_CLASS)
                 .filter(x => !(parseInt(x) >= 0))
                 .map( (charaClass) => {
                     return { 
