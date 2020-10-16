@@ -233,7 +233,7 @@ const actions = {
 
         //  calculate effect
         p1.mana     -= isTargetSelf && isFocusSkill ? 0 - baseDamage : skillWielded.cost;
-        p1.health   += isTargetSelf ? Math.abs(baseDamage) : 0;
+        p1.health   += isTargetSelf && !isFocusSkill ? Math.abs(baseDamage) : 0;
         p2.health   -= !isTargetSelf ? baseDamage : 0;
 
         //  clear out of bound stats
@@ -311,10 +311,10 @@ const mutations = {
     [MUTATION_TYPES.SET_SKILLS_EFFECT] (state, payload) {
         const { p1: p1Stats, p2: p2Stats, povTurn } = payload;
 
-        if (p1Stats.mana)   state.matchData.p1.stats.mana   = p1Stats.mana;
-        if (p1Stats.health) state.matchData.p1.stats.health = p1Stats.health;
-        if (p2Stats.mana)   state.matchData.p2.stats.mana   = p2Stats.mana;
-        if (p2Stats.health) state.matchData.p2.stats.health = p2Stats.health;
+        if (typeof p1Stats.mana !== 'undefined')   state.matchData.p1.stats.mana   = p1Stats.mana;
+        if (typeof p1Stats.health !== 'undefined') state.matchData.p1.stats.health = p1Stats.health;
+        if (typeof p2Stats.mana !== 'undefined')   state.matchData.p2.stats.mana   = p2Stats.mana;
+        if (typeof p2Stats.health !== 'undefined') state.matchData.p2.stats.health = p2Stats.health;
               
         state.matchData.povTurn = povTurn;
 
